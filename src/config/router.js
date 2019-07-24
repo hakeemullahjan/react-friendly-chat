@@ -9,7 +9,7 @@ function Navigation(){
                 <Route exact path='/'  component={Screens.Signin} />
                 <Route exact path='/signin'  component={Screens.Signin} />
                 <Route path='/signup'  component={Screens.Signup} />
-                <Route path='/chat' component={Screens.Chat} />
+                <Route path='/chat/:chatroomID' component={Screens.Chat} />
                 <Route path='/chatlist' component={Screens.ChatList} />
             </div>
         </Router>

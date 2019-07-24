@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {getAllUsers} from '../config/firebase'
+import {getAllUsers,createChatRoom} from '../config/firebase'
 import loaderImg from '../assets/EmptyDeliriousBluefish-small.gif'
 import Button from '@material-ui/core/Button';
 
@@ -23,8 +23,17 @@ class ChatList extends Component {
         this.setState({users:a})
     }
 
-    _createChatRoom(msg){
-        console.log(msg)
+   async _createChatRoom(friendID){
+       try{
+           let a=await createChatRoom(friendID);
+           console.log('return promise resolved data--------->',a.data);
+           console.log(a.chatroomID);
+        this.props.history.push(`/chat/${a.chatroomID}`);
+       }
+       catch(err){
+           console.log('error in creating chatroom',err.message)
+           alert(err.message);
+       }
     }
 
     render() {
@@ -43,7 +52,7 @@ class ChatList extends Component {
         {users.map((item,key)=>{
             return(
                 <li key={key} >{item.email}  
-      <Button variant="contained" size='small'  color='secondary' onClick={()=>this._createChatRoom('hakeemullah')}  >CHAT</Button>
+      <Button variant="contained" size='small'  color='secondary' onClick={()=>this._createChatRoom(item._id)}  >CHAT</Button>
       </li>
             )
         })}

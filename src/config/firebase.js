@@ -71,6 +71,82 @@ import { resolve, reject } from 'q';
   }
 
 
+  function createChatRoom(friendID){
+    const userID=auth.currentUser.uid;
+    let chatExists=false;
+    // console.log('friendID----->',friendID)
+    // console.log('userID------->',userID)
+
+    return new Promise((resolve,reject)=>{
+        
+        db.collection('chatrooms')
+        .where('users.'+userID,'==',true)
+        .where('users.'+friendID,'==',true)
+        .get().then(snapshot=>{
+            snapshot.forEach(elem=>{
+                chatExists={data:elem.data(),chatroomID:elem.id}
+            })
+
+            if(!chatExists){
+                const obj={
+                createdAt:Date.now(),
+                users:{
+                    [userID]:true,
+                    [friendID]:true,
+                }
+            }
+            db.collection('chatrooms').add(obj).then(snapshot=>{
+                resolve({data:obj,chatroomID:snapshot.id})
+            })
+            }else{
+                resolve(chatExists)
+            }
+    
+        })
+
+
+        //my logic for creating chatroom but it fails bcoz every user chatroom is created
+        // const obj={
+        //     createdAt:Date.now(),
+        //     users:{
+        //         friendID:friendID,
+        //         userID:userID,
+        //     }
+        // }
+        //    db.collection('chatrooms').doc(friendID+userID).get()
+        //    .then(snapshot=>{
+        //        console.log(snapshot)
+        //         console.log('chatroom exist====>',snapshot.exists);    
+        //     if(!snapshot.exists){
+        //         db.collection('chatrooms').doc(friendID+userID).set(obj).then(()=>{
+        //             console.log('if false it will create generate chatroom------>')
+        //             resolve({data:obj,chatroomID:friendID+userID})
+        //         })
+        //     }else{
+        //         resolve({data:snapshot.data(),chatroomID:snapshot.id})
+        //     }
+        // })
+
+        
+
+       
+    })
+
+  }
+
+
+
+ function sendMessagesToDB(chatroomID,message){
+    //  console.log('chatroomID--------->',chatroomID)
+    //  console.log('text--------------->',text)
+    const obj={
+        message,
+        userID:auth.currentUser.uid,
+        timestamp:Date.now(),
+    }
+    return db.collection('chatrooms').doc(chatroomID).collection('messages').add(obj)
+  }
+
 
 
 
@@ -81,4 +157,6 @@ import { resolve, reject } from 'q';
       signupUser,
       signinUser,
       getAllUsers,
+      createChatRoom,
+      sendMessagesToDB
   }
